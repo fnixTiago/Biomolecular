@@ -5,7 +5,7 @@
 
 using namespace std;
 typedef char T;
-
+//Derechos de autor: Israel Santiago Pancca Mamani
 void generar_matriz(vector<vector<int> > &M, string cad1, string cad2,int match, int mismatch, int gap_penalty){
 	M.resize(cad1.size()+1);
 	for (int i = 0; i < M.size(); ++i){
