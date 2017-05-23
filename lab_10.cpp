@@ -75,7 +75,8 @@ void alineamiento(string cad1,string cad2, int match,int mismatch,int U){
 	//cout<<"\nIni2:"<<ini2<<"\nFin2:"<<fin2<<endl;
 
 	vector<pair<char,char> > v_hsp;
-	multimap<vector<pair<char,char> > ,int> all;
+	//multimap<vector<pair<char,char> > ,int> all;
+	vector<pair<vector<pair<char,char> > ,int> > all;
 	pair<char,char> pareja;
 	int HSP=0;
 	while(ini1>=0 && ini2>=0 && fin1 <= (cad1.size()) && fin2<=(cad2.size()) ){
@@ -87,7 +88,9 @@ void alineamiento(string cad1,string cad2, int match,int mismatch,int U){
 		cout<<"\nIni1:"<<ini1<<"\nFin1:"<<fin1<<endl;
 		cout<<"\nIni2:"<<ini2<<"\nFin2:"<<fin2<<endl;
 		cout<<"\nHSP: "<<HSP<<endl;
-		*/all.insert(pair<vector<pair<char,char> > ,int>(v_hsp, HSP));
+		*/
+		//all.insert(pair<vector<pair<char,char> > ,int>(v_hsp, HSP));
+		all.push_back(pair<vector<pair<char,char> > ,int>(v_hsp, HSP));
 		if(ini1>0 && ini2>0){
 			ini1--;
 			ini2--;
