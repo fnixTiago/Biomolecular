@@ -271,8 +271,8 @@ void crear_matriz(vector<string>&data,  pair<pair<string, string>, pair<int,int>
 	vector<tuple<char, char, char>> progresive;
 	int i=M.size()-1;
 	int j=M[0].size()-1;
+	char c1,c2,c3;
 	while(i>0 && j>0){
-		char c1,c2,c3;
 		
 		int pesoT =get_peso3(data[i_0][j],data[i_1][j],data[pos_fil][i],gap,mismatch);
 		if(M[i][j]== (pesoT+ M[i-1][j-1]) && (M[i][j]!= (M[i][j-1] + vacio)) && (M[i][j]!= (M[i-1][j] + vacio)) ){ //diagonal
@@ -309,6 +309,37 @@ void crear_matriz(vector<string>&data,  pair<pair<string, string>, pair<int,int>
 		}
 		cout<<endl;
 	}
+
+	if (i>0){
+		//cout<<"\n\t i: "<<i<<endl;
+		for (int k1 = i; k1 > 0; --k1)
+		{
+			c1 =data[i_0][j];
+			c2 =data[i_1][j];
+			c3 =data[pos_fil][k1];
+			tuple<char,char,char> foo(c1,c2,'-');
+			progresive.push_back(foo);
+			//alineados.push_back(make_pair(cad1[k1],'-'));
+		}
+	}
+	if(j>0){
+		//cout<<"\n\t j: "<<j<<endl;
+		for (int k1 = j; k1 >0; --k1)
+		{
+			c1 =data[i_0][k1];
+			c2 =data[i_1][k1];
+			c3 =data[pos_fil][i];
+			tuple<char,char,char> foo(c1,c2,'-');
+			progresive.push_back(foo);
+		}
+	}
+
+
+
+
+
+
+
 	reverse(progresive.begin(), progresive.end());
 	for(tuple<char, char, char> t: progresive)
 	{
@@ -376,9 +407,9 @@ int main(int argc, char const *argv[])
 	//vector<pair<char,char> >alineados;
 	vector<string> M;
 	int gap,mismatch;
-	M.push_back("ACTCAT");
-	M.push_back("AGTCAT");
-	M.push_back("ACGTCCT");
+	M.push_back("ACTCATGAAAA");
+	M.push_back("ACGTCCTG");
+	M.push_back("AGTCATGAA");
 	mismatch =3;
 	gap =2;
 

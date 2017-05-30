@@ -164,6 +164,102 @@ int obtner_peso(vector<pair<char,char>> &v, int match, int mismatch, int gap){
 	}
 	return resultado;
 }
+
+//string obtener_cadena(vector<pair<char, char> >&alineados,bool pos){
+int buscar_guion(string &cad,int pos_ini){
+	for (int i =pos_ini; i < cad.size(); ++i){
+		if(cad[i]=='-')
+			return i;
+	}
+	return -1;
+}
+void agregar_guion(string &cad, int pos){
+	string tmp="";
+	for (int i = 0; i < cad.size(); ++i){
+		if(i==(pos)){
+			tmp +='-';
+			tmp +=cad[i];
+		}
+		else tmp +=cad[i];
+	}
+	cad =tmp;
+
+}
+
+void alterar(vector<string> &v, int pos, int final){
+	string tmp="";
+	for (int i = 0; i <=final; ++i){
+		agregar_guion(v[i], pos);
+	}
+}
+void alterar_ultimo(vector<string> &v,vector<int> v_posi){
+	int tam_i =v[0].size();//tamanio de cadena inicial
+	int tam_f =v[v.size()-1].size();//ultimo tamanio
+	cout<<"\ntam_i: "<<tam_i<<endl;
+	cout<<"\ntam_f: "<<tam_f<<endl;
+	string tmp="";
+	string cad= v[v.size()-1];
+	for (int i = 0, j=0; i < cad.size() ; ++i){
+		if(i ==v_posi[j] && j <(tam_i- tam_f) ){
+			cout<<"\nENTRO \n";
+			//tmp +='-';
+			tmp +=cad[i];
+			j++;
+		}
+		tmp +=cad[i];
+		
+
+	}
+	v[v.size()-1] = tmp;
+}
+
+void alinemaiento_all(vector<pair<string,string> >&tmp){
+	vector<string> v;
+	int pos=0;
+	/*
+	for (int i = 0; i < tmp.size(); ++i){
+		cout<<i<<" : \n"<<"\t"<<tmp[i].first<<"\n\t"<<tmp[i].second<<endl;
+	}
+	*/
+	//Los primeros 
+	int guiones=0;
+	v.push_back(tmp[0].first);
+	v.push_back(tmp[0].second);
+
+	for (int i = 1; i < tmp.size(); ++i){
+		if(i==0)
+			v.push_back(tmp[i].first);
+		v.push_back(tmp[i].second);
+	}
+
+
+	vector<int> v_posi;
+	for (int i = 1; i < tmp.size(); ++i){
+		if(v[0]==tmp[i].first);
+			//v.push_back(tmp[i].second);
+		else{
+			int pos_c =buscar_guion(tmp[i].first, pos);
+			if(pos<pos_c){
+				pos =pos_c;
+				cout<<"\tPOSI: "<<pos_c<<endl;
+				alterar(v,pos+guiones,i);
+				//v.push_back(tmp[i].second);
+				v_posi.push_back(pos);
+				guiones++;
+			}
+		}/*
+			cout<<"\n\t"<<i<<endl;
+			for (int i = 0; i < v.size(); ++i){
+				cout<<"\t"<<v[i]<<endl;
+			*/
+	}
+	alterar_ultimo(v,v_posi);
+
+	for (int i = 0; i < v.size(); ++i){
+		cout<<i<<": \t"<<v[i]<<endl;
+	}
+}
+
 	
 void alineamiento_etrella(vector<pair<char, char> >&alineados, map<char,map<char, int> > &datos,vector<string> cadenas, int match,int mismatch,int gap){
 	//creamos la matriz
@@ -207,6 +303,7 @@ void alineamiento_etrella(vector<pair<char, char> >&alineados, map<char,map<char
 	cout<<"Mejor resultado: M["<<pos<<"]: "<<max<<endl;
 	vector<string> cadenas_result;
 	vector<string> cadenas_result1;
+	vector<pair<string,string> >step_3;
 	//needleman_wunch(tmp,datos,cadenas[pos],cadenas[]);
 	bool primera_vez= true;		
 	for (int i = 0; i < cadenas.size(); ++i){
@@ -220,6 +317,7 @@ void alineamiento_etrella(vector<pair<char, char> >&alineados, map<char,map<char
 			}
 			cadenas_result1.push_back(obtener_cadena(tmp,0));
 			cadenas_result.push_back(obtener_cadena(tmp,1));
+			step_3.push_back(make_pair(obtener_cadena(tmp,0), obtener_cadena(tmp,1)));
 			cout<<"\nS["<<pos<<"] :\t";
 			for (int i = 0; i < tmp.size(); ++i){
 				cout<<tmp[i].first;
@@ -231,6 +329,13 @@ void alineamiento_etrella(vector<pair<char, char> >&alineados, map<char,map<char
 			cout<<endl;
 		}
 	}
+	cout<<"\n****************************\n";
+	alinemaiento_all(step_3);
+
+
+
+
+	/*
 	cout<<"\nCADENAS RESULTANTES\n";
 	for (int i = 0; i < cadenas_result.size(); ++i){
 		cout<<"S"<<i<<": "<<cadenas_result[i]<<endl;
@@ -242,8 +347,9 @@ void alineamiento_etrella(vector<pair<char, char> >&alineados, map<char,map<char
 		cadena_tmp = obtener_cadena(tmp,0);
 	//	cout<<"\n\t"<<cadena_tmp<<endl;	
 	}
+	*/
 //	cout<<"******************\n\t"<<cadena_tmp<<endl;
-
+/*
 	for (int i = 0; i < cadenas_result.size(); ++i){
 		//for (int j = 0; j < cadenas_result.size(); ++j)
 		//{
@@ -254,7 +360,7 @@ void alineamiento_etrella(vector<pair<char, char> >&alineados, map<char,map<char
 		//}
 		cout<<"\n\t"<<cadena_tmp;	
 	}
-
+*/
 }
 
 
@@ -276,10 +382,10 @@ int main(int argc, char const *argv[])
 	mismatch =-1;
 	gap =-2;
 	
-	cadenas.push_back("CCTGCTGCAG");
+	cadenas.push_back("CCTGCTGCAGGGG");
 	cadenas.push_back("GATGTGCCG");
 	cadenas.push_back("GATGTGCAG");
-	cadenas.push_back("CCGCTAGCAG");
+	cadenas.push_back("CCGCTAGCAGGGG");
 	cadenas.push_back("CCTGTAGG");
 	
 	/*
@@ -291,9 +397,6 @@ int main(int argc, char const *argv[])
 	*/
 	alineamiento_etrella(alineados, datos,cadenas,match,mismatch,gap);
 	//alineamiento_etrella(alineados, datos,cadenas1,match,mismatch,gap);
-	
-
 	cout<<"\nEXITO\n";
 	return 0;
 }
-
