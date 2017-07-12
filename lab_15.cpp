@@ -7,7 +7,7 @@ using namespace std;
 #define match 3
 #define mismatch 1
 #define gap 0
-#define N 100//tamaño de la poblacion
+#define N 4//tamaño de la poblacion
 #define prob_cruza 0.9//probabilidad de Cruzamiento
 #define prob_muta 0.2//probabilidad de mutacion
 
@@ -222,9 +222,9 @@ void ordenar_todo(vector<vector<string> >&n_data){
 	std::map<double, int>::iterator it;
 	int i=0;
 	for (it=mymap.begin(); it!=mymap.end(); ++it){
-    	//std::cout << it->first << " => " << it->second << '\n';
+    	std::cout << it->first << " => " << it->second << '\n';
     	if(mymap.size()/2 >i)
-    		n_data_temp.push_back(n_data[it->first]);
+    		n_data_temp.push_back(n_data[it->second]);
     	i++;
 	}
 	n_data.clear();
@@ -280,7 +280,7 @@ int main(int argc, char const *argv[])
 	vector<string> v_padre_hijos;
 	vector<string> v_madre_hijos;
 	int itera =0;  
-	while(itera <= 10){
+	while(itera <= 1000){
 		cout<<"\n**************************ITERACION: "<<itera<<endl;
 		for (int i = 0; i < N/2; ++i)
 		{
@@ -388,7 +388,7 @@ int main(int argc, char const *argv[])
 			v_ruleta.push_back(1.0*aptitud(n_data[i])/suma);
 		}
 		printf("\n******************************\n");
-		
+	
 		cout<<"\nCantidad: "<<n_data.size()<<endl;	
 			itera++;
 
