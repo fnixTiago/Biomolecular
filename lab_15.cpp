@@ -7,10 +7,9 @@ using namespace std;
 #define match 3
 #define mismatch 1
 #define gap 0
-#define N 4//tamaño de la poblacion
+#define N 100//tamaño de la poblacion
 #define prob_cruza 0.9//probabilidad de Cruzamiento
 #define prob_muta 0.2//probabilidad de mutacion
-
 
 
 double random_0_1(){//numeros aleatorios entre -1 y 1
@@ -205,8 +204,32 @@ pair<string, string > cruzamiento_punto(string &cad1, string &cad2, int random){
 	return par;
 }
 
-int seleccion(){
-	//seleccionaremos a los padres seleccion por ruleta
+void ordenar_todo(vector<vector<string> >&n_data){
+	//ordenamos todo
+	
+	vector<vector<string> > n_data_temp;//=  n_data;
+	double suma=0.0;
+	for (int i = 0; i < n_data.size(); ++i){
+		suma +=aptitud(n_data[i]);
+	}
+
+	multimap<double, int > mymap;
+	for (int i = 0; i < n_data.size(); ++i){
+		mymap.insert(pair<double,int>(1.0*aptitud(n_data[i])/suma, i));
+	}
+
+	
+	std::map<double, int>::iterator it;
+	int i=0;
+	for (it=mymap.begin(); it!=mymap.end(); ++it){
+    	//std::cout << it->first << " => " << it->second << '\n';
+    	if(mymap.size()/2 >i)
+    		n_data_temp.push_back(n_data[it->first]);
+    	i++;
+	}
+	n_data.clear();
+	n_data = n_data_temp;	
+
 }
 
 
@@ -238,7 +261,7 @@ int main(int argc, char const *argv[])
 		//cout<<"\tSuma Pares: "<<aptitud(n_data[i])<<endl;
 		suma +=aptitud(n_data[i]);
 	}
-	
+	cout<<"\nMostrar toda la poblacion \n";
 	for (int i = 0; i < n_data.size(); ++i){
 		cout<<"\n"<<i<<": \n";
 		mostrar_matriz(n_data[i]);
@@ -250,82 +273,126 @@ int main(int argc, char const *argv[])
 	
 
 
-	double n_ramdon =random_0_1();
-	int padre_posi = ruleta(v_ruleta,n_ramdon);
-	cout<<"\tPadre: "<<n_ramdon<<" -> "<<padre_posi<<endl;
-	int madre_posi =padre_posi;
-	//buscaremos una posicion diferente al padre
-	while(madre_posi == padre_posi){
-		n_ramdon =random_0_1();
-		madre_posi =ruleta(v_ruleta,n_ramdon);
-		if(madre_posi != padre_posi)
-			break;
-	}
-	cout<<"\tMadre: "<<n_ramdon<<" -> "<<madre_posi<<endl;
-
+	
 	//SAGA - Cruzamiento
 	vector<string> v_padre;
 	vector<string> v_madre;
 	vector<string> v_padre_hijos;
 	vector<string> v_madre_hijos;
+	int itera =0;  
+	while(itera <= 10){
+		cout<<"\n**************************ITERACION: "<<itera<<endl;
+		for (int i = 0; i < N/2; ++i)
+		{
+			
+			double n_ramdon =random_0_1();
+			int padre_posi = ruleta(v_ruleta,n_ramdon);
+			cout<<"\tPadre: "<<n_ramdon<<" -> "<<padre_posi<<endl;
+			int madre_posi =padre_posi;
+			//buscaremos una posicion diferente al padre
+			while(madre_posi == padre_posi){
+				n_ramdon =random_0_1();
+				madre_posi =ruleta(v_ruleta,n_ramdon);
+				if(madre_posi != padre_posi)
+					break;
+			}
+			cout<<"\tMadre: "<<n_ramdon<<" -> "<<madre_posi<<endl;
 
-	v_padre =n_data[padre_posi];
-	v_madre =n_data[madre_posi];
-	int ramdon_i;
-	double ramdon_cruz,ramdon_muta;
-	pair<string,string> hijos;
-	for (int i = 0; i < v_padre.size(); ++i){
-		ramdon_cruz = random_0_1();
-		if( prob_cruza <= ramdon_cruz){
-			ramdon_i =random() % v_padre[i].size();
-			cout<<"\nCruzamiento\n";
-			hijos =cruzamiento_punto(v_padre[i],v_madre[i],ramdon_i);
-			v_padre_hijos.push_back(hijos.first);
-			v_madre_hijos.push_back(hijos.second);	
+			//saga de cruzamiento
+			v_padre =n_data[padre_posi];
+			v_madre =n_data[madre_posi];
+			int ramdon_i;
+			double ramdon_cruz,ramdon_muta;
+			pair<string,string> hijos;
+			for (int i = 0; i < v_padre.size(); ++i){
+				ramdon_cruz = random_0_1();
+				if( prob_cruza <= ramdon_cruz){
+					ramdon_i =random() % v_padre[i].size();
+					cout<<"\nCruzamiento\n";
+					hijos =cruzamiento_punto(v_padre[i],v_madre[i],ramdon_i);
+					v_padre_hijos.push_back(hijos.first);
+					v_madre_hijos.push_back(hijos.second);	
 
+				}
+				else{
+					v_padre_hijos.push_back(v_padre[i]);
+					v_madre_hijos.push_back(v_madre[i]);
+				} 
+			}
+			cout<<"\nHIJOS Padre sin mutar: \n";
+			mostrar_matriz(v_padre_hijos);
+			
+			cout<<"\nHIJOS Madre sin mutar: \n";
+			mostrar_matriz(v_madre_hijos);
+			//padre
+			ramdon_muta = random_0_1();
+			if( prob_muta <= ramdon_muta ){
+				cout<<"\tMuta hijo de padre\n";
+				int ramdon_hijo = random() % v_padre.size();
+				int tamanio =v_padre[ramdon_hijo].size();
+				v_padre_hijos[ramdon_hijo] =quitar_space_cad(v_padre_hijos[ramdon_hijo]);
+				llenar_space_cad(v_padre_hijos[ramdon_hijo],tamanio );
+			}
+			//madre
+			ramdon_muta = random_0_1();
+			if( prob_muta <= ramdon_muta ){
+				cout<<"\tMuta hijo de madre\n";
+				int ramdon_hijo = random() % v_madre.size();
+				int tamanio =v_madre[ramdon_hijo].size();
+				v_madre_hijos[ramdon_hijo] =quitar_space_cad(v_madre_hijos[ramdon_hijo]);
+				llenar_space_cad(v_madre_hijos[ramdon_hijo],tamanio );
+			}
+			//agregamos a los hijos
+			n_data.push_back(v_padre_hijos);
+			n_data.push_back(v_madre_hijos);
+		/*	cout<<"\nPadre: \n";
+			mostrar_matriz(n_data[padre_posi]);
+			
+			cout<<"\nMadre: \n";
+			mostrar_matriz(n_data[madre_posi]);
+			//cout<<"\n***********************************************\n";
+			cout<<"\nHIJOS Padre: \n";
+			mostrar_matriz(v_padre_hijos);
+			
+			cout<<"\nHIJOS Madre: \n";
+			mostrar_matriz(v_madre_hijos);
+			*/
+
+			//limpiamos
+			
+			v_padre.clear();
+			v_madre.clear();
+			v_padre_hijos.clear();
+			v_madre_hijos.clear();
+
+			
+/*
+			cout<<"\nMostrar toda la poblacion \n";
+			for (int i = 0; i < n_data.size(); ++i){
+				cout<<"\n"<<i<<": \n";
+				mostrar_matriz(n_data[i]);
+				cout<<"\tSuma Pares: "<<aptitud(n_data[i])<<endl;
+				cout<<"\tPorcentaje: "<<1.0*aptitud(n_data[i])/suma<<endl;
+				v_ruleta.push_back(1.0*aptitud(n_data[i])/suma);
+			}
+			printf("\n******************************\n");
+			*/
 		}
-		else{
-			v_padre_hijos.push_back(v_padre[i]);
-			v_madre_hijos.push_back(v_madre[i]);
-		} 
+		ordenar_todo(n_data);
+		cout<<"\nMostrar toda la poblacion \n";
+		for (int i = 0; i < n_data.size(); ++i){
+			cout<<"\n"<<i<<": \n";
+			mostrar_matriz(n_data[i]);
+			cout<<"\tSuma Pares: "<<aptitud(n_data[i])<<endl;
+			cout<<"\tPorcentaje: "<<1.0*aptitud(n_data[i])/suma<<endl;
+			v_ruleta.push_back(1.0*aptitud(n_data[i])/suma);
+		}
+		printf("\n******************************\n");
+		
+		cout<<"\nCantidad: "<<n_data.size()<<endl;	
+			itera++;
+
 	}
-	cout<<"\nHIJOS Padre sin mutar: \n";
-	mostrar_matriz(v_padre_hijos);
-	
-	cout<<"\nHIJOS Madre sin mutar: \n";
-	mostrar_matriz(v_madre_hijos);
-	//padre
-	ramdon_muta = random_0_1();
-	if( prob_muta <= ramdon_muta ){
-		cout<<"\tMuta hijo de padre\n";
-		int ramdon_hijo = random() % v_padre.size();
-		int tamanio =v_padre[ramdon_hijo].size();
-		v_padre_hijos[ramdon_hijo] =quitar_space_cad(v_padre_hijos[ramdon_hijo]);
-		llenar_space_cad(v_padre_hijos[ramdon_hijo],tamanio );
-	}
-	//madre
-	ramdon_muta = random_0_1();
-	if( prob_muta <= ramdon_muta ){
-		cout<<"\tMuta hijo de madre\n";
-		int ramdon_hijo = random() % v_madre.size();
-		int tamanio =v_madre[ramdon_hijo].size();
-		v_madre_hijos[ramdon_hijo] =quitar_space_cad(v_madre_hijos[ramdon_hijo]);
-		llenar_space_cad(v_madre_hijos[ramdon_hijo],tamanio );
-	}
-	//agregamos a los hijos
-	n_data.push_back(v_padre_hijos);
-	n_data.push_back(v_madre_hijos);
-	cout<<"\nPadre: \n";
-	mostrar_matriz(n_data[padre_posi]);
-	
-	cout<<"\nMadre: \n";
-	mostrar_matriz(n_data[madre_posi]);
-	//cout<<"\n***********************************************\n";
-	cout<<"\nHIJOS Padre: \n";
-	mostrar_matriz(v_padre_hijos);
-	
-	cout<<"\nHIJOS Madre: \n";
-	mostrar_matriz(v_madre_hijos);
 	
 	//cout<<"\n****: \t"<<quitar_space_cad("T---TA--G")<<endl;
 
@@ -371,11 +438,6 @@ int main(int argc, char const *argv[])
 	return 0;
 }
 
-Get the verage of the surrounding BLUR_SIZE x BLUR_SIZE box
-for (int blurRow = -BLUR_SIZE; blurRow < BLUR_SIZE+1; ++blurRow){
-	for (int blurCol = -BLUR_SIZE; blurCol < BLUR_SIZE +1; ++blurCol){
-		int curRow =Row + blurRow;
-	}
-	/* code */
-}
+
+
 
